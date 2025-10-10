@@ -4,6 +4,10 @@ class Nave {
 	var velocidad       = 0
 	var velocidadMaxima = 300000
 
+	method velocidad() {
+		return velocidad
+	}
+
 	method propulsar() {
 		velocidad = (velocidad + 20000).min(velocidadMaxima)
 	}
@@ -38,15 +42,23 @@ class NaveDeCarga inherits Nave {
 }
 
 class NaveDeCargaRadiactiva inherits NaveDeCarga {
-	var selladoAlVacio = true
+	var estaSelladaAlVacio = false
+
+	method estaSelladaAlVacio() {
+		return estaSelladaAlVacio
+	}
 	
 	override method recibirAmenaza() {
 		velocidad = 0
 	}
 
+	method sellarAlVacio() {
+		estaSelladaAlVacio = true
+	}
+
 	override method prepararParaViajar() {
 		super()
-		selladoAlVacio = true
+		self.sellarAlVacio()
 	}
 	
 }
