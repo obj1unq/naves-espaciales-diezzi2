@@ -1,21 +1,71 @@
-class NaveDeCarga {
+// Superclase ---------------------------------------------------------------------------------------------
 
-	var velocidad = 0
+class Nave {
+	var velocidad       = 0
+	var velocidadMaxima = 300000
+
+	method velocidad() {
+		return velocidad
+	}
+
+	method propulsar() {
+		velocidad = (velocidad + 20000).min(velocidadMaxima)
+	}
+
+	method recibirAmenaza() {
+	  
+	}
+
+	method prepararParaViajar() {
+		velocidad = (velocidad + 15000).min(velocidadMaxima)
+	}
+
+	method encontrarEnemigo() {
+		self.recibirAmenaza()
+		self.propulsar()
+	}
+}
+
+// Subclases: Naves de carga ------------------------------------------------------------------------------
+
+class NaveDeCarga inherits Nave {
 	var property carga = 0
 
 	method sobrecargada() = carga > 100000
 
 	method excedidaDeVelocidad() = velocidad > 100000
 
-	method recibirAmenaza() {
+	override method recibirAmenaza() {
 		carga = 0
 	}
 
 }
 
-class NaveDePasajeros {
+class NaveDeCargaRadiactiva inherits NaveDeCarga {
+	var estaSelladaAlVacio = false
 
-	var velocidad = 0
+	method estaSelladaAlVacio() {
+		return estaSelladaAlVacio
+	}
+	
+	override method recibirAmenaza() {
+		velocidad = 0
+	}
+
+	method sellarAlVacio() {
+		estaSelladaAlVacio = true
+	}
+
+	override method prepararParaViajar() {
+		super()
+		self.sellarAlVacio()
+	}
+	
+}
+
+// Subclase: Nave de pasajeros ----------------------------------------------------------------------------
+
+class NaveDePasajeros inherits Nave {
 	var property alarma = false
 	const cantidadDePasajeros = 0
 
@@ -25,14 +75,15 @@ class NaveDePasajeros {
 
 	method estaEnPeligro() = velocidad > self.velocidadMaximaLegal() or alarma
 
-	method recibirAmenaza() {
+	override method recibirAmenaza() {
 		alarma = true
 	}
 
 }
 
-class NaveDeCombate {
-	var property velocidad = 0
+// Subclase: Nave de combate ------------------------------------------------------------------------------
+
+class NaveDeCombate  inherits Nave {
 	var property modo = reposo
 	const property mensajesEmitidos = []
 
@@ -44,11 +95,17 @@ class NaveDeCombate {
 
 	method estaInvisible() = velocidad < 10000 and modo.invisible()
 
-	method recibirAmenaza() {
+	override method recibirAmenaza() {
 		modo.recibirAmenaza(self)
 	}
 
+	override method prepararParaViajar() {
+		super()
+		modo.prepararParaViajar(self)
+	}
 }
+
+	// Modos de nave de combate
 
 object reposo {
 
@@ -58,6 +115,10 @@ object reposo {
 		nave.emitirMensaje("¡RETIRADA!")
 	}
 
+	method prepararParaViajar(nave) {
+		nave.emitirMensaje("Saliendo en misión")
+		nave.modo(ataque)
+	}
 }
 
 object ataque {
@@ -68,4 +129,7 @@ object ataque {
 		nave.emitirMensaje("Enemigo encontrado")
 	}
 
+	method prepararParaViajar(nave) {
+		nave.emitirMensaje("Volviendo a la base")
+	}
 }
